@@ -21,7 +21,7 @@ classNames = { 0: 'background',
 
 # Open video file or capture device. 
 cap = cv2.VideoCapture("video2.avi")
-
+#cap = cv2.VideoCapture(1)
 #Load the Caffe model 
 net = cv2.dnn.readNetFromCaffe("MobileNetSSD_deploy.prototxt", "MobileNetSSD_deploy.caffemodel")
 
@@ -106,10 +106,10 @@ while True:
                     bbox = ((xLeftBottom), (yLeftBottom),abs(xRightTop-xLeftBottom), abs(yRightTop-yLeftBottom))
                     
                     ok = tracker.init(frame, bbox)
+                    
                     ok, bb = tracker.update(frame)
-
                     if main_object.probability<confidence and ok==True:
-                        #main_object.info=info
+                        #main_object.info=info                      
                         main_object.map=bb
                         main_object.name=classNames[class_id]
                         main_object.probability=confidence
@@ -124,18 +124,19 @@ while True:
                     cv2.putText(frame, label, (xLeftBottom, yLeftBottom),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
 
-                    
-                    key=False
+                    if ok==True:
+                        key=False
 
         
   
     if key==False:
-        ok, bbox = tracker.update(frame)
+        if count_Mtemplate!=0:
+            ok, bbox = tracker.update(frame)
 
         # Draw bounding box
         if ok:
             count_Mtemplate=count_Mtemplate+1
-            if (count_Mtemplate>30):
+            if (count_Mtemplate>40):
                 current_img=frame[int(bbox[0]):int(bbox[0]+bbox[2]),int(bbox[1]):int(bbox[1]+bbox[3])]
                 count_img=0
                 _try=_try+1
