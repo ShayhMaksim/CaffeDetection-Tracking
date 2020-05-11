@@ -42,7 +42,7 @@ frame_height = int(cap.get(4))
 
 # Define the codec and create VideoWriter object.The output is stored in 'outpy.avi' file.
 
-out = cv2.VideoWriter('TrackerCSRT333.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
+out = cv2.VideoWriter('TrackerCSRT.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
 
 while True:
     # Start timer
@@ -93,7 +93,7 @@ while True:
             # Draw location of object  
                 cv2.rectangle(frame, (xLeftBottom, yLeftBottom), (xRightTop, yRightTop),(0, 255, 0))
 
-                info=getAngle(Camera(640,480,320,240,pi*75./180),Object(4,1.5),camera_matrix,xLeftBottom,yLeftBottom,xRightTop,yRightTop)
+                #info=getAngle(Camera(640,480,320,240,pi*75./180),Object(4,1.5),camera_matrix,xLeftBottom,yLeftBottom,xRightTop,yRightTop)
 
             # Draw label and confidence of prediction in frame resized
                 if class_id in classNames:
@@ -109,7 +109,7 @@ while True:
                     ok, bb = tracker.update(frame)
 
                     if main_object.probability<confidence and ok==True:
-                        main_object.info=info
+                        #main_object.info=info
                         main_object.map=bb
                         main_object.name=classNames[class_id]
                         main_object.probability=confidence
@@ -124,6 +124,7 @@ while True:
                     cv2.putText(frame, label, (xLeftBottom, yLeftBottom),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
 
+                    
                     key=False
 
         
@@ -134,7 +135,7 @@ while True:
         # Draw bounding box
         if ok:
             count_Mtemplate=count_Mtemplate+1
-            if (count_Mtemplate>60):
+            if (count_Mtemplate>30):
                 current_img=frame[int(bbox[0]):int(bbox[0]+bbox[2]),int(bbox[1]):int(bbox[1]+bbox[3])]
                 count_img=0
                 _try=_try+1
@@ -180,12 +181,12 @@ while True:
         else :
             # Tracking failure
             count_img=count_img+1
-            if (count_img>2):
-                count_img=0
-                _try=_try+1
-                key=True
-                cv2.putText(frame, "Tracking failure detected", (20,40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1)
-                count_Mtemplate=0
+            # if (count_img>2):
+            count_img=0
+            _try=_try+1
+            key=True
+            cv2.putText(frame, "Tracking failure detected", (20,40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1)
+            count_Mtemplate=0
 
 
     fps = cv2.getTickFrequency() / (cv2.getTickCount() - timer); 
@@ -201,6 +202,6 @@ while True:
         break
 
 df.head()
-df.to_csv("TrackerCSRT333")
+df.to_csv("TrackerCSRT")
 cap.release()
 out.release()
