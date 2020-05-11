@@ -26,7 +26,7 @@ cap = cv2.VideoCapture("video2.avi")
 net = cv2.dnn.readNetFromCaffe("MobileNetSSD_deploy.prototxt", "MobileNetSSD_deploy.caffemodel")
 
 main_object=Class(None,None,None)
-tracker = cv2.TrackerTLD_create()
+tracker = cv2.TrackerCSRT_create()
 key=True
 count_img=0
 count_Mtemplate=0
@@ -43,7 +43,7 @@ frame_height = int(cap.get(4))
 
 # Define the codec and create VideoWriter object.The output is stored in 'outpy.avi' file.
 
-out = cv2.VideoWriter('TrackerTLD.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
+out = cv2.VideoWriter('TrackerCSRT.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
 
 while True:
     # Start timer
@@ -52,7 +52,7 @@ while True:
     ok, frame = cap.read()
     
     if (key==True):
-        tracker = cv2.TrackerTLD_create()
+        tracker = cv2.TrackerCSRT_create()
         
         frame_resized = cv2.resize(frame,(300,300)) # resize frame for prediction
         main_object=Class(None,None,None)
@@ -106,14 +106,15 @@ while True:
                         yLeftBottom=0
                     bbox = ((xLeftBottom), (yLeftBottom),abs(xRightTop-xLeftBottom), abs(yRightTop-yLeftBottom))
                     
-                    ok = tracker.init(frame, bbox)
+                    # ok = tracker.init(frame, bbox)
                     
-                    ok, bb = tracker.update(frame)
-                    if main_object.probability<confidence and ok==True:
+                    # ok, bb = tracker.update(frame)
+                    if main_object.probability<confidence:
                         #main_object.info=info                      
-                        main_object.map=bb
+                        main_object.map=bbox
                         main_object.name=classNames[class_id]
                         main_object.probability=confidence
+                        ok = tracker.init(frame, bbox)
 
                     label = classNames[class_id] + ": " + str(confidence)
                     labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
@@ -131,19 +132,19 @@ while True:
         
   
     if key==False:
-        if count_Mtemplate!=0:
-            ok, bbox = tracker.update(frame)
+        #if count_Mtemplate!=0:
+        ok, bbox = tracker.update(frame)
 
         # Draw bounding box
         if ok:
-            # count_Mtemplate=count_Mtemplate+1
-            # if (count_Mtemplate>120):
-            #     current_img=frame[int(bbox[0]):int(bbox[0]+bbox[2]),int(bbox[1]):int(bbox[1]+bbox[3])]
-            #     count_img=0
-            #     _try=_try+1
-            #     key=True
-            #     cv2.putText(frame, "Update", (20,40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1)
-            #     count_Mtemplate=0
+            count_Mtemplate=count_Mtemplate+1
+            if (count_Mtemplate>120):
+                current_img=frame[int(bbox[0]):int(bbox[0]+bbox[2]),int(bbox[1]):int(bbox[1]+bbox[3])]
+                count_img=0
+                _try=_try+1
+                key=True
+                cv2.putText(frame, "Update", (20,40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1)
+                count_Mtemplate=0
 
             # Tracking success
             p1 = (int(bbox[0]), int(bbox[1]))
@@ -204,6 +205,6 @@ while True:
         break
 
 df.head()
-df.to_csv("TrackerTLD")
+df.to_csv("TrackerCSRT")
 cap.release()
 out.release()
