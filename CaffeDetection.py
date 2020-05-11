@@ -26,7 +26,7 @@ cap = cv2.VideoCapture("video2.avi")
 net = cv2.dnn.readNetFromCaffe("MobileNetSSD_deploy.prototxt", "MobileNetSSD_deploy.caffemodel")
 
 main_object=Class(None,None,None)
-tracker = cv2.TrackerCSRT_create()
+tracker = cv2.TrackerTLD_create()
 key=True
 count_img=0
 count_Mtemplate=0
@@ -39,10 +39,11 @@ frame_width = int(cap.get(3))
 
 frame_height = int(cap.get(4))
 
+#ok=None
 
 # Define the codec and create VideoWriter object.The output is stored in 'outpy.avi' file.
 
-out = cv2.VideoWriter('TrackerCSRT.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
+out = cv2.VideoWriter('TrackerTLD.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
 
 while True:
     # Start timer
@@ -51,7 +52,7 @@ while True:
     ok, frame = cap.read()
     
     if (key==True):
-        
+        tracker = cv2.TrackerTLD_create()
         
         frame_resized = cv2.resize(frame,(300,300)) # resize frame for prediction
         main_object=Class(None,None,None)
@@ -135,14 +136,14 @@ while True:
 
         # Draw bounding box
         if ok:
-            count_Mtemplate=count_Mtemplate+1
-            if (count_Mtemplate>40):
-                current_img=frame[int(bbox[0]):int(bbox[0]+bbox[2]),int(bbox[1]):int(bbox[1]+bbox[3])]
-                count_img=0
-                _try=_try+1
-                key=True
-                cv2.putText(frame, "Update", (20,40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1)
-                count_Mtemplate=0
+            # count_Mtemplate=count_Mtemplate+1
+            # if (count_Mtemplate>120):
+            #     current_img=frame[int(bbox[0]):int(bbox[0]+bbox[2]),int(bbox[1]):int(bbox[1]+bbox[3])]
+            #     count_img=0
+            #     _try=_try+1
+            #     key=True
+            #     cv2.putText(frame, "Update", (20,40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1)
+            #     count_Mtemplate=0
 
             # Tracking success
             p1 = (int(bbox[0]), int(bbox[1]))
@@ -181,9 +182,9 @@ while True:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0))
         else :
             # Tracking failure
-            count_img=count_img+1
-            # if (count_img>2):
-            count_img=0
+            #count_img=count_img+1
+            #if (count_img>3):
+            #count_img=0
             _try=_try+1
             key=True
             cv2.putText(frame, "Tracking failure detected", (20,40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(0,0,255),1)
@@ -203,6 +204,6 @@ while True:
         break
 
 df.head()
-df.to_csv("TrackerCSRT")
+df.to_csv("TrackerTLD")
 cap.release()
 out.release()
