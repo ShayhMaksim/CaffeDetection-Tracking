@@ -7,14 +7,14 @@
   <cols>3</cols>
   <dt>d</dt>
   <data>
-    7.8616850092106131e+02 0. 320. 0. 7.9401578293823570e+02 240. 0. 0.
+    6.9642048339031021e+02 0. 320. 0. 6.9537324762648461e+02 240. 0. 0.
     1.</data></camera_matrix>
 <distorion_coefficients type_id="opencv-matrix">
   <rows>1</rows>
   <cols>5</cols>
   <dt>d</dt>
   <data>
-    1.1284230230538748e-01 8.1798014396082175e-01 0. 0.
-    -8.7427103937023141e+00</data></distorion_coefficients>
-<error>3.4198740838625652e-01</error>
+    7.4349301802134074e-02 -7.0749658329709775e-01 0. 0.
+    2.3059936688576812e+00</data></distorion_coefficients>
+<error>3.0413357901566346e-01</error>
 </opencv_storage>
