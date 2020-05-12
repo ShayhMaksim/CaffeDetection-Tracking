@@ -56,11 +56,11 @@ def getAngle(camera,RealObject,intrinsic_matrix,xLeftBottom,yLeftBottom,xRightTo
     focus_y=intrinsic_matrix[1,1]
 
     #угол обзора по ширине (половина угла)
-    max_angle_x=atan(camera.width/focus_x)
+    max_angle_x=atan(camera.width/(2*focus_x))
     #угол обзора по высоте
-    max_angle_y=atan(camera.height/focus_y)
+    max_angle_y=atan(camera.height/(2*focus_y))
 
-    #ширина объекта в пикселях
+    #ширина объекта в пикселя
     width_obj=abs(xRightTop-xLeftBottom)
     #высота объекта в пикселях
     height_obj=abs(yLeftBottom-yRightTop)
