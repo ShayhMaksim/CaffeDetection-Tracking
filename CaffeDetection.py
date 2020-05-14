@@ -4,7 +4,7 @@ import argparse
 import cv2 
 from models import *
 import pandas as pd
-
+import time
 
 df=pd.DataFrame(columns=['C_X','C_Y','width','height','D','Vx','Vy','fps','try'])
 print(df.head())
@@ -50,6 +50,7 @@ while True:
     timer = cv2.getTickCount()
     # Capture frame-by-frame
     ok, frame = cap.read()
+    mini_time=time.time()
     
     if (key==True):
         tracker = cv2.TrackerCSRT_create()
@@ -166,10 +167,15 @@ while True:
             #центр цели по оси Y
             Center_y=bbox[1]+bbox[3]/2
 
-            Vx=float(Center_x-old_c_X)/(cv2.getTickCount() - timer)
-            Vy=float(Center_y-old_c_Y)/(cv2.getTickCount() - timer)
+            #print(time.time()-mini_time)
+            fps = cv2.getTickFrequency() / (cv2.getTickCount() - timer); 
+            Vx=float(Center_x-old_c_X)/(1./30)
+            Vy=float(Center_y-old_c_Y)/(1./30)
             main_object.map=bbox
             main_object.info=info
+            coeffVx,coeffVy=GetCoeff(main_object.info.D)
+            main_object.Vx=Vx/fx*coeffVx
+            main_object.Vy=Vy/fy*coeffVy
 
             df.loc[table_index]={'C_X':Center_x,'C_Y':Center_y,'width':bbox[2],'height':bbox[3],'D':main_object.info.D,'Vx':main_object.Vx,'Vy':main_object.Vy,'fps':(cv2.getTickFrequency() / (cv2.getTickCount() - timer)),'try':_try}
             table_index=table_index+1
@@ -177,8 +183,8 @@ while True:
             cv2.putText(frame, "D:"+"{:.3f}".format(main_object.info.D)+" "+\
                             "u_0:"+"{:.3f}".format(main_object.info.u_0)+" "+\
                             "fi_V:"+"{:.3f}".format(main_object.info.fi_v)+" "+\
-                            "Vx:"+"{:.5f}".format(main_object.Vx)+" "+\
-                            "Vy:"+"{:.5f}".format(main_object.Vy)+" ",\
+                            "Vx:"+"{:.8f}".format(main_object.Vx)+" "+\
+                            "Vy:"+"{:.8f}".format(main_object.Vy)+" ",\
                             (20, 40),\
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0))
         else :

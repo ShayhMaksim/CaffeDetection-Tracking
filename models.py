@@ -31,7 +31,7 @@ class Camera:
 
 
 class Class:
-    def __init__(self,info:BalisticInfo,name:str,map:tuple,Vx=0,Vy=0,probability=0.):
+    def __init__(self,info:BalisticInfo,name:str,map:tuple,Vx=0.,Vy=0.,probability=0.):
         self.info=info
         self.name=name
         self.map=map
@@ -84,3 +84,6 @@ def getAngle(camera,RealObject,intrinsic_matrix,xLeftBottom,yLeftBottom,xRightTo
     info=BalisticInfo(u_0,fi_v,D)
 
     return info
+
+def GetCoeff(D:float):# CoeffVx,CoeffVy
+    return D*1.2, D*0.9    
