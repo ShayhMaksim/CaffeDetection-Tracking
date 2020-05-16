@@ -10,6 +10,8 @@ df=pd.DataFrame(columns=['C_X','C_Y','width','height','D','Vx','Vy','fps','try']
 print(df.head())
 table_index=0
 _try=0
+sumImage=0
+
 
 # Labels of Network.
 classNames = { 0: 'background',
@@ -26,7 +28,7 @@ cap = cv2.VideoCapture("video2.avi")
 net = cv2.dnn.readNetFromCaffe("MobileNetSSD_deploy.prototxt", "MobileNetSSD_deploy.caffemodel")
 
 main_object=Class(None,None,None)
-tracker = cv2.TrackerCSRT_create()
+tracker = cv2.TrackerBoosting_create()
 key=True
 count_img=0
 count_Mtemplate=0
@@ -43,17 +45,17 @@ frame_height = int(cap.get(4))
 
 # Define the codec and create VideoWriter object.The output is stored in 'outpy.avi' file.
 
-out = cv2.VideoWriter('TrackerCSRT.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
+out = cv2.VideoWriter('TrackerBoosting.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
 
 while True:
     # Start timer
     timer = cv2.getTickCount()
     # Capture frame-by-frame
     ok, frame = cap.read()
-    mini_time=time.time()
+    sumImage=sumImage+1
     
     if (key==True):
-        tracker = cv2.TrackerCSRT_create()
+        tracker = cv2.TrackerBoosting_create()
         
         frame_resized = cv2.resize(frame,(300,300)) # resize frame for prediction
         main_object=Class(None,None,None)
@@ -95,7 +97,7 @@ while True:
             # Draw location of object  
                 cv2.rectangle(frame, (xLeftBottom, yLeftBottom), (xRightTop, yRightTop),(0, 255, 0))
 
-                #info=getAngle(Camera(640,480,320,240,pi*75./180),Object(4,1.5),camera_matrix,xLeftBottom,yLeftBottom,xRightTop,yRightTop)
+                info=getAngle(Camera(640,480,320,240,pi*75./180),Object(4,1.5),camera_matrix,xLeftBottom,yLeftBottom,xRightTop,yRightTop)
 
             # Draw label and confidence of prediction in frame resized
                 if class_id in classNames:
@@ -111,7 +113,7 @@ while True:
                     
                     # ok, bb = tracker.update(frame)
                     if main_object.probability<confidence:
-                        #main_object.info=info                      
+                        main_object.info=info                      
                         main_object.map=bbox
                         main_object.name=classNames[class_id]
                         main_object.probability=confidence
@@ -161,7 +163,12 @@ while True:
             cv2.rectangle(frame, p1, p2, (255,0,0), 2, 1)
             cv2.putText(frame, "{0} ".format(main_object.name)+"{:.3f}".format(main_object.probability), (xLeftBottom, yLeftBottom),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
 
+            #старые данные
             old_c_X,old_c_Y=main_object.getCenter()
+            old_D=main_object.info.D
+            old_fi_v=main_object.info.fi_v
+            old_u_0=main_object.info.u_0
+
             #центр цели по оси Х
             Center_x=bbox[0]+bbox[2]/2
             #центр цели по оси Y
@@ -169,13 +176,16 @@ while True:
 
             #print(time.time()-mini_time)
             fps = cv2.getTickFrequency() / (cv2.getTickCount() - timer); 
-            Vx=float(Center_x-old_c_X)/(1./30)
-            Vy=float(Center_y-old_c_Y)/(1./30)
+            #Vx=float(Center_x-old_c_X)/(1./10)
+            #Vy=float(Center_y-old_c_Y)/(1./10)
             main_object.map=bbox
             main_object.info=info
-            coeffVx,coeffVy=GetCoeff(main_object.info.D)
-            main_object.Vx=Vx/fx*coeffVx
-            main_object.Vy=Vy/fy*coeffVy
+            #coeffVx,coeffVy=GetCoeff(main_object.info.D)
+            Vx,Vy = GetV(old_D,main_object.info.D,old_fi_v,main_object.info.fi_v,old_u_0,main_object.info.u_0)
+            # main_object.Vx=Vx/fx*coeffVx
+            # main_object.Vy=Vy/fy*coeffVy
+            main_object.Vx=Vx*10
+            main_object.Vy=Vy*10
 
             df.loc[table_index]={'C_X':Center_x,'C_Y':Center_y,'width':bbox[2],'height':bbox[3],'D':main_object.info.D,'Vx':main_object.Vx,'Vy':main_object.Vy,'fps':(cv2.getTickFrequency() / (cv2.getTickCount() - timer)),'try':_try}
             table_index=table_index+1
@@ -211,6 +221,7 @@ while True:
         break
 
 df.head()
-df.to_csv("TrackerCSRT")
+df.to_csv("TrackerBoosting")
+print(sumImage)
 cap.release()
 out.release()
