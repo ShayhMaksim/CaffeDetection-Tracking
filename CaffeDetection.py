@@ -184,8 +184,9 @@ while True:
             Vx,Vy = GetV(old_D,main_object.info.D,old_fi_v,main_object.info.fi_v,old_u_0,main_object.info.u_0)
             # main_object.Vx=Vx/fx*coeffVx
             # main_object.Vy=Vy/fy*coeffVy
-            main_object.Vx=Vx*10
-            main_object.Vy=Vy*10
+            main_object.Vx=Vx*10*3.6
+            main_object.Vy=Vy*10*3.6
+            absV=sqrt(main_object.Vx**2+main_object.Vy**2)
 
             df.loc[table_index]={'C_X':Center_x,'C_Y':Center_y,'width':bbox[2],'height':bbox[3],'D':main_object.info.D,'Vx':main_object.Vx,'Vy':main_object.Vy,'fps':(cv2.getTickFrequency() / (cv2.getTickCount() - timer)),'try':_try}
             table_index=table_index+1
@@ -193,8 +194,9 @@ while True:
             cv2.putText(frame, "D:"+"{:.3f}".format(main_object.info.D)+" "+\
                             "u_0:"+"{:.3f}".format(main_object.info.u_0)+" "+\
                             "fi_V:"+"{:.3f}".format(main_object.info.fi_v)+" "+\
-                            "Vx:"+"{:.8f}".format(main_object.Vx)+" "+\
-                            "Vy:"+"{:.8f}".format(main_object.Vy)+" ",\
+                            "Vx:"+"{:.5f}".format(main_object.Vx)+" "+\
+                            "Vy:"+"{:.5f}".format(main_object.Vy)+" "+\
+                            "absV:"+"{:.5f}".format(absV),\
                             (20, 40),\
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0))
         else :
