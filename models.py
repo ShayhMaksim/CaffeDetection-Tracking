@@ -72,14 +72,15 @@ def getAngle(camera,RealObject,intrinsic_matrix,xLeftBottom,yLeftBottom,xRightTo
 
     #auto D_x=focus_x*RealObject.width/width_obj;
     if (height_obj<width_obj):
-        D=focus_y*RealObject.height/(height_obj*sin(camera.gamma))
+        D=focus_y*RealObject.height/(height_obj)
     else:
-        D_x=focus_x*RealObject.width/(width_obj*sin(camera.gamma))
-        D_y=focus_y*RealObject.height/(height_obj*sin(camera.gamma))
+        D_x=focus_x*RealObject.width/(width_obj)
+        D_y=focus_y*RealObject.height/(height_obj)
         D=(D_x+D_y)/2.
 
-    u_0=max_angle_x*(Center_x-camera.c_X)/camera.c_X*180./pi
-    fi_v=max_angle_x*(Center_y-camera.c_Y)/camera.c_Y*180./pi
+
+    u_0=max_angle_y*(Center_y-camera.c_Y)/camera.c_Y*180./pi
+    fi_v=max_angle_x*(Center_x-camera.c_X)/camera.c_X*180./pi
 
     info=BalisticInfo(u_0,fi_v,D)
 
@@ -87,3 +88,13 @@ def getAngle(camera,RealObject,intrinsic_matrix,xLeftBottom,yLeftBottom,xRightTo
 
 def GetCoeff(D:float):# CoeffVx,CoeffVy
     return D*1.2, D*0.9    
+
+def sign(x):
+    if x>0: return 1
+    if x==0: return 0
+    if x<0: return -1
+
+def GetV(D1:float,D2:float,f1:float,f2:float,u1:float,u2:float):
+    Vx=sqrt(D1**2+D1**2-2*D1*D1*cos((f2-f1)*pi/180))*sign(f2-f1)
+    Vy=sqrt(D1**2+D2**2-2*D1*D2*cos((u2-u1)*pi/180))*sign(u2-u1)
+    return Vx,Vy
