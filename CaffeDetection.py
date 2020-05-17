@@ -157,6 +157,18 @@ while True:
             yLeftBottom=int(bbox[1])
             xRightTop=int(bbox[2]+bbox[0])
             yRightTop=int(bbox[3]+bbox[1])
+
+            read_path=frame[yLeftBottom:yRightTop,xLeftBottom:xRightTop]
+            #gray=cv2.cvtColor(read_path,cv2.COLOR_BGR2GRAY)
+            #edged=cv2.Canny(gray,30,200)
+            #edged.copy()
+            #contours,hierarchy=cv2.findContours(edged,cv2.RETR_LIST,cv2.CHAIN_APPROX_NONE )
+            #cv2.drawContours(read_path,contours,-1,(0,255,0),3)
+            #for c in contours:
+            #[x, y, w, h]=cv2.boundingRect(c)
+            #cv2.rectangle(frame,(xLeftBottom+x,yLeftBottom+y),(xLeftBottom+x+w,yLeftBottom+y+h),(0,255,0),1)
+            cv2.imshow("hehe",read_path)
+
             info=getAngle(Camera(640,480,320,240,pi*75./180),Object(4,1.5),camera_matrix,xLeftBottom,yLeftBottom,xRightTop,yRightTop)
 
 
@@ -168,6 +180,8 @@ while True:
             old_D=main_object.info.D
             old_fi_v=main_object.info.fi_v
             old_u_0=main_object.info.u_0
+            
+            
 
             #центр цели по оси Х
             Center_x=bbox[0]+bbox[2]/2
